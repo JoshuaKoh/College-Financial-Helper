@@ -2,7 +2,8 @@
 {% block body %}
   <h2>Form</h2>
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
-  <form action="{{ url_for('form_submitted') }}" method=post>
+  {% if message %}<p class=message><strong>{{ message }}</strong>{% endif %}
+  <form action="{{ url_for('form_submit') }}" method=post>
     <dl>
       <dt>Username:
       <dd><input type=text name=username>
