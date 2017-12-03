@@ -2,14 +2,14 @@
 {% block body %}
   <h2>Form</h2>
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
-  {% if message %}<p class=message><strong>{{ message }}</strong>{% endif %}
+  {% if result %}<p class=message><strong>{{ result }}</strong>{% endif %}
   <form action="{{ url_for('form_submit') }}" method=post>
     <dl>
-      <dt>Username:
-      <dd><input type=text name=username>
-      <dt>Password:
-      <dd><input type=password name=password>
-      <dd><input type=submit value=Login>
+      <dt>State:
+      <dd><input type=text name=state>
+      <dt>Major:
+      <dd><input type=password name=major>
+      <dd><input type=submit value=Query>
     </dl>
   </form>
 {% endblock %}
