@@ -1,0 +1,8 @@
+{% extends "layout.html" %}
+{% block body %}
+  <h2>Question List</h2>
+  {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
+
+  <a href="{{ url_for('proximity') }}">Schools Near Me</a>
+
+{% endblock %}
