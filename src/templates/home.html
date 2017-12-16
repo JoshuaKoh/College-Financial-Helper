@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h2>Home</h2>
+    <h4>What's the most cost-efficient school?</h4>
+
+    {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
+
+    Pick a program: <br/>
+    <a href="{{ url_for('georgia_mvp') }}">Georgia MVP</a>
+
+{% endblock %}

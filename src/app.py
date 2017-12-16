@@ -18,19 +18,19 @@ df = pd.read_csv('../data/college-scorecard.csv', sep=',',
 
 @app.route('/')
 def q_list():
-    return render_template('q_list.html',
+    return render_template('home.html',
                            title='Question List')
 
 
-@app.route('/proximity')
-def proximity():
-    return render_template('proximity.html',
+@app.route('/georgia_mvp')
+def georgia_mvp():
+    return render_template('georgia_mvp.html',
                            title='Schools Near Me',
                            result=None)
 
 
-@app.route('/proximity', methods=['POST'])
-def proximity_submit():
+@app.route('/georgia_mvp', methods=['POST'])
+def georgia_mvp_submit():
     state = request.form['state']
     major = request.form['major']
     dataByState = data.getByState(state, major)
@@ -48,7 +48,7 @@ def proximity_submit():
         html += "<i>SAT average: " + str(school['SAT_AVG_ALL']) + "</i><br/>"
         html += "-----<br/>"
 
-    return render_template('proximity.html',
+    return render_template('georgia_mvp.html',
                            title='Schools Near Me Submitted',
                            error=error,
                            result=html)
