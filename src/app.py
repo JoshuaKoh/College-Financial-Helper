@@ -1,7 +1,12 @@
-from flask import Flask, session, render_template, request
+from flask import Flask, render_template, request
 import os
 import pandas as pd
 import ingest as data
+import dropoutAnalysis
+import appUtil as AU
+import logging
+
+log = logging.getLogger(__name__)
 
 app = Flask(__name__)
 df = pd.read_csv('../data/college-scorecard.csv', sep=',',
@@ -35,10 +40,7 @@ def georgia_mvp_submit():
     major = request.form['major']
     dataByState = data.getByState(state, major)
 
-    if dataByState.empty:
-        error = "That's not a state code. Please try again."
-    else:
-        error = None
+    error = AU.isError(dataByState.empty, "That's not a state code. Please try again.")
 
     html = ""
     for index, school in dataByState.iterrows():
@@ -52,6 +54,21 @@ def georgia_mvp_submit():
                            title='Schools Near Me Submitted',
                            error=error,
                            result=html)
+
+
+@app.route('/dropout')
+def dropout():
+    didRun = dropoutAnalysis.run(df)
+    error = AU.isError(not didRun, "Analysis failed to run.")
+
+    if error:
+        log.error(error)
+    else:
+        log.info("Successful dropout load.")
+
+    return render_template('dropout.html',
+                           title='Dropout Model',
+                           error=error)
 
 
 @app.route('/form')
@@ -72,5 +89,9 @@ def form_submit():
 
 
 if __name__ == "__main__":
+    fh = logging.FileHandler("trace.log", 'w')
+    fh.setLevel(logging.INFO)
+    logging.basicConfig(level="INFO")
+
     app.secret_key = os.urandom(24)
     app.run(debug=True)

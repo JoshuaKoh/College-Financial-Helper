@@ -6,6 +6,13 @@
     {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
 
     Pick a program: <br/>
-    <a href="{{ url_for('georgia_mvp') }}">Georgia MVP</a>
+    <ul>
+        <li>
+            <a href="{{ url_for('georgia_mvp') }}">Georgia MVP</a>
+        </li>
+        <li>
+            <a href="{{ url_for('dropout') }}">Dropout Model</a>
+        </li>
+    </ul>
 
 {% endblock %}
