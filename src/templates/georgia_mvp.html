@@ -1,26 +1,56 @@
 {% extends "layout.html" %}
 {% block body %}
 
-    <h2>Georgia Schools (MVP)</h2>
-    {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
+<h2>Georgia Schools (MVP)</h2>
+{% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
 
-    <form action="{{ url_for('georgia_mvp') }}" method=post>
-        <dl>
-            <dt>Enter your zip code:
-            <dd><input type=text name=zip>
-            <dt>Enter your major:
-            <!--TODO MAKE THIS A SELECTOR-->
-            <dd><input type=text name=major>
-            <dt>Enter your SAT score:
-            <dd><input type=text name=sat>
-            <dt>Enter your ACT score:
-            <dd><input type=text name=act>
-            <dd><input type=submit value=Query>
-        </dl>
-    </form>
+    <script>
+        function updateMajorDescription() {
+            var description = document.getElementsByName("majorDescription")[0];
+            var major = document.getElementsByName("majorSelect")[0];
 
-    {% if result %}
-        {{ result | safe }}
-    {% endif %}
+            document.getElementsByName('selectHint')[0].selectedIndex = -1;
+            var rawNewDescription = major.options[major.selectedIndex].getAttribute("data-description");
+
+            if (rawNewDescription == "nan") {
+                description.innerHTML = "<br/>";
+            } else {
+                var newDescription = "Includes " + rawNewDescription
+                description.innerHTML = newDescription;
+            }
+        }
+    </script>
+
+<form action="{{ url_for('georgia_mvp') }}" method=post>
+    <dl>
+        <dt>Enter your zip code:
+        <dd><input type=text name=zip required>
+        <br/>
+
+        <dt>Enter your major:
+        <dd><select name="majorSelect" width="400px" onchange="updateMajorDescription()" required>
+            <option disabled selected value name="selectHint" style="display:none"> -- select a major -- </option>
+            {% for m in majors %}
+            <option value="{{ m[1] }}" data-description="{{ m[2] }}">{{ m[0] }}</option>
+            {% endfor %}
+        </select>
+
+        <dd name="majorDescription">Please select a major.</dd>
+
+        <dt>Enter your SAT score:
+        <dd><input type=text name=sat required>
+        <br/>
+
+        <dt>Enter your ACT score:
+        <dd><input type=text name=act required>
+        <br/>
+
+        <dt><input type=submit value=Submit>
+    </dl>
+</form>
+
+{% if result %}
+    {{ result | safe }}
+{% endif %}
 
 {% endblock %}

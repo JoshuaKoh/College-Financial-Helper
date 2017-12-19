@@ -1,11 +1,12 @@
 import pandas as pd
+from dataStore import filterForDropout
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import LabelEncoder
 from sklearn import preprocessing
 from sklearn.decomposition import PCA
 import time
 import matplotlib.pyplot as plt
-import ingest
+import dataOperations
 from flask import Flask
 import logging
 
@@ -16,7 +17,7 @@ app = Flask(__name__)
 def run(df):
     lb = LabelEncoder()
 
-    df = ingest.filterForDropout(df)
+    df = filterForDropout(df)
 
     # TODO NORMALIZE DATA WITHIN NUMERICAL SCALE
     for column in df.columns:

@@ -1,3 +1,7 @@
+def selectSchools(df, zip, major, sat, act):
+    return None
+
+
 # TODO FILTER BY MAJOR
 
 # TODO LEAST SUM SQUARED WEIGHTING SO THAT SCHOOLS WITH TOO HIGH TEST SCORES ARE DIS-VALUED

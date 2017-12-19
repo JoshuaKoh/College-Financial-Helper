@@ -1,6 +1,24 @@
-from app import df as app_df
 import pandas as pd
 
+'''
+DATA SOURCES
+'''
+raw_df = pd.read_csv('../data/college-scorecard.csv', sep=',',
+                     dtype={'ZIP': str,
+                            'NPCURL': str,
+                            'C150_L4_POOLED_SUPP': str,
+                            'C150_4_POOLED_SUPP': str,
+                            'C200_L4_POOLED_SUPP': str,
+                            'C200_4_POOLED_SUPP': str,
+                            'ALIAS': str,
+                            'T4APPROVALDATE': str
+                            })
+majors_mapping = pd.read_excel('../data/scorecard-majors-mapping.xlsx')
+
+
+'''
+COLUMN COLLECTIONS
+'''
 importantColumns = ['INSTNM',           # Institution Name
                     'CITY',             # City
                     'STABBR',           # State Abbreviation
@@ -190,22 +208,6 @@ dropout_columns = ["REGION",            # Geographic region
                    "PCT90_EARN_WNE_P10",
                    "SD_EARN_WNE_P10"
                    ]
-
-
-# Read and clean data
-def importAndPrep(app):
-    # Remove sufficiently null columns
-    nullCols = app_df.columns[app_df.isnull().sum() > (len(app_df)/2)].tolist()
-    app_df.drop(nullCols, axis=1, inplace=True)
-
-    app.logger.debug("Prepared %i rows!" % len(app_df))
-
-    return app_df
-
-
-def getByState(state, major=None):
-    if major is not None:
-        return app_df[app_df.STABBR == state][importantColumns]
 
 
 def filterForDropout(df):
