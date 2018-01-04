@@ -1,4 +1,7 @@
 import pandas as pd
+import logging
+
+log = logging.getLogger(__name__)
 
 '''
 DATA SOURCES
@@ -219,8 +222,29 @@ def filterForDropout(df):
     df = df[df[IS_OPERATING] == 1]
     filterByColumn = pd.DataFrame(df, columns=dropout_columns)
 
-    nullCols = filterByColumn.columns[filterByColumn.isnull().sum() > (len(filterByColumn) / 2)].tolist()
-    filterByColumn.drop(nullCols, axis=1, inplace=True)
+    filterByColumn.dropna(axis=1, how='all')
 
     return filterByColumn
 
+
+def reduceRaw(df):
+    withoutNulls = df.dropna(axis=1, how='all', inplace=False)
+    withoutNonOperational = withoutNulls[withoutNulls["CURROPER"] == 1]
+
+    log.info("Prepared %i rows!" % len(withoutNonOperational))
+
+    return withoutNonOperational
+
+
+reduced_df = reduceRaw(raw_df)
+
+
+def getMajorsForDropdown():
+    columns = ["FormattedName", "ShortName", "Description"]
+    majors = majors_mapping[majors_mapping.FormattedName.notnull()][columns]
+    asSorted = majors.sort_values("FormattedName")
+
+    return asSorted
+
+
+dropdownMap = getMajorsForDropdown()

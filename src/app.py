@@ -22,7 +22,7 @@ def q_list():
 def georgia_mvp():
     return render_template('georgia_mvp.html',
                            title='School Finder',
-                           majors=do.dfToTuple(do.majorsMap),
+                           majors=do.dfToTuple(dropdownMap),
                            result=None)
 
 
@@ -30,9 +30,11 @@ def georgia_mvp():
 def georgia_mvp_submit():
     state = request.form['zip']
     major = request.form['majorSelect']
-    sat = request.form['sat']
+    sat_crit = request.form['sat_ct']
+    sat_writ = request.form['sat_wr']
+    sat_math = request.form['sat_ma']
     act = request.form['act']
-    schools = schoolSelector.selectSchools(raw_df, state, major, sat, act)
+    schools = schoolSelector.selectSchools(state, major, sat_crit, sat_writ, sat_math, act)
 
     return render_template('georgia_mvp.html',
                            title='School Finder',

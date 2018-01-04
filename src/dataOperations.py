@@ -1,48 +1,34 @@
-from dataStore import (majors_mapping, raw_df, importantColumns)
 import logging
+import pandas as pd
+from dataStore import majors_mapping
 
 log = logging.getLogger(__name__)
 
 
-def getMajorsForDropdown():
-    columns = ["FormattedName", "ShortName", "Description"]
-    majors = majors_mapping[majors_mapping.FormattedName.notnull()][columns]
-    majors.sort_values("FormattedName", inplace=True)
-
-    return majors
+def getByState(df, state):
+    return df[df.STABBR == state]
 
 
-majorsMap = getMajorsForDropdown()
-
-
-def importAndPrep(df):
-    # Remove sufficiently null columns
-    nullCols = df.columns[df.isnull().sum() > (len(df)/2)].tolist()
-    df.drop(nullCols, axis=1, inplace=True)
-
-    log.info("Prepared %i rows!" % len(df))
-
-    return df
-
-
-def getByState(state, major=None):
-    if major is not None:
-        return raw_df[raw_df.STABBR == state][importantColumns]
-
-
-def getByMajor(majors):
+def getByMajor(df, majors):
     # TODO extend this to accept multiple majors
     major = majors[0]
     if major == "resources":
-        return majorsMap[(majorsMap["ShortName"] == "agriculture") |
-                         (majorsMap["ShortName"] == "resources")]
+        majorsToQuery = majors_mapping[(majors_mapping["ShortName"] == "agriculture") |
+                                       (majors_mapping["ShortName"] == "resources")]
     elif major == "engineering_technology":
-        return majorsMap[(majorsMap["ShortName"] == "engineering") |
-                         (majorsMap["ShortName"] == "engineering_technology")]
+        majorsToQuery = majors_mapping[(majors_mapping["ShortName"] == "engineering") |
+                                       (majors_mapping["ShortName"] == "engineering_technology")]
     elif major == "precision_production":
-        return majorsMap[(majorsMap["ShortName"] == "mechanic_repair_technology") |
-                         (majorsMap["ShortName"] == "precision_production")]
-    return majorsMap[majorsMap["ShortName"] == major]
+        majorsToQuery = majors_mapping[(majors_mapping["ShortName"] == "mechanic_repair_technology") |
+                                       (majors_mapping["ShortName"] == "precision_production")]
+    else:
+        majorsToQuery = majors_mapping[majors_mapping["ShortName"] == major]
+
+    byMajor = pd.DataFrame()
+    for index, row in majorsToQuery.iterrows():
+        byMajor = pd.concat([df[df[row["Code"]] > 0], byMajor])
+
+    return byMajor
 
 
 def dfToTuple(df):
