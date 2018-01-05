@@ -3,6 +3,8 @@ import locationUtil as locU
 import testScoreUtil as testU
 from dataStore import reduced_df
 import numpy as np
+import pandas as pd
+from schoolCorrelation import schoolsACTSimilarTo, schoolsSATSimilarTo
 
 
 def selectSchools(zipCode, major, sat_crit, sat_writ, sat_math, act):
@@ -13,18 +15,25 @@ def selectSchools(zipCode, major, sat_crit, sat_writ, sat_math, act):
     userState, userLat, userLong = locU.extractDataFromZip(zipCode)
     byState = do.getByState(byMajor, userState)
 
+    for index, row in byState.iterrows():
+        byState.loc[byState['UNITID'] == row["UNITID"], 'ACTCMMID'] = schoolsACTSimilarTo(row)
+        byState.loc[byState['UNITID'] == row["UNITID"], 'SAT_AVG'] = schoolsSATSimilarTo(row)
+
     withNoSATNulls = byState[byState["SAT_AVG"].notnull()]
     withNoACTNulls = withNoSATNulls[withNoSATNulls["ACTCMMID"].notnull()]
+    withNoSAT0s = withNoACTNulls[withNoACTNulls["SAT_AVG"] != 0]
+    finalDf = withNoSAT0s[withNoSAT0s["ACTCMMID"] != 0]
 
     userSATwritNorm = testU.normalizeSAT(sat_writ)
     userSATcritNorm = testU.normalizeSAT(sat_crit)
     userSATmathNorm = testU.normalizeSAT(sat_math)
     userACTNorm = testU.normalizeACT(act)
 
-    for index, row in withNoACTNulls.iterrows():
+    finalDf = finalDf.assign(cost_points=pd.Series(np.zeros(len(finalDf))).values)
+
+    for index, row in finalDf.iterrows():
         cost_points = 0.0
 
-        print(row["INSTNM"])
         schoolState = row["STABBR"]
         schoolLat = row["LATITUDE"]
         schoolLng = row["LONGITUDE"]
@@ -142,7 +151,6 @@ def selectSchools(zipCode, major, sat_crit, sat_writ, sat_math, act):
         else:
             cost_points += 6 * squaredACT
 
-        print(cost_points)
         # TODO WEIGHTING FOR LOCATION
 
         # TODO WEIGHTING FOR STARTING SALARY
@@ -156,8 +164,11 @@ def selectSchools(zipCode, major, sat_crit, sat_writ, sat_math, act):
 
         # TODO SOME KIND OF ANALYSIS FOR COST...?
 
-    # TODO SORT BY CP COLUMN AND RETURN
+        finalDf.loc[finalDf['UNITID'] == row["UNITID"], 'cost_points'] = cost_points
 
+    # TODO SORT BY CP COLUMN AND RETURN
+    sortedDf = finalDf.sort_values("cost_points")
+    print(sortedDf[["INSTNM", "cost_points"]])
     return None
 
 
@@ -168,4 +179,4 @@ def testScoreLossFunc(score1, score2):
     return ((score1**2) - (score2**2))**2
 
 
-selectSchools("91326", "engineering", 790, 800, 800, 35)
+selectSchools("30277", "business_marketing", 790, 800, 800, 35)
