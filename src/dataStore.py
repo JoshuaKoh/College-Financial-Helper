@@ -16,6 +16,16 @@ raw_df = pd.read_csv('../data/college-scorecard.csv', sep=',',
                             'ALIAS': str,
                             'T4APPROVALDATE': str
                             })
+raw_old_df = pd.read_csv('../data/old-scorecard.csv', sep=',',
+                     dtype={'ZIP': str,
+                            'NPCURL': str,
+                            'C150_L4_POOLED_SUPP': str,
+                            'C150_4_POOLED_SUPP': str,
+                            'C200_L4_POOLED_SUPP': str,
+                            'C200_4_POOLED_SUPP': str,
+                            'ALIAS': str,
+                            'T4APPROVALDATE': str
+                            })
 majors_mapping = pd.read_excel('../data/scorecard-majors-mapping.xlsx')
 
 
@@ -212,7 +222,45 @@ dropout_columns = ["REGION",            # Geographic region
                    "SD_EARN_WNE_P10"
                    ]
 
-
+degreeColumns = [
+    "PCIP01",
+    "PCIP03",
+    "PCIP04",
+    "PCIP05",
+    "PCIP09",
+    "PCIP10",
+    "PCIP11",
+    "PCIP12",
+    "PCIP13",
+    "PCIP14",
+    "PCIP15",
+    "PCIP16",
+    "PCIP19",
+    "PCIP22",
+    "PCIP23",
+    "PCIP24",
+    "PCIP25",
+    "PCIP26",
+    "PCIP27",
+    "PCIP29",
+    "PCIP31",
+    "PCIP38",
+    "PCIP39",
+    "PCIP40",
+    "PCIP41",
+    "PCIP42",
+    "PCIP43",
+    "PCIP44",
+    "PCIP45",
+    "PCIP46",
+    "PCIP47",
+    "PCIP48",
+    "PCIP49",
+    "PCIP50",
+    "PCIP51",
+    "PCIP52",
+    "PCIP54",
+]
 def filterForDropout(df):
     RETENTION = "RET_FT4"
     df = df[(df[RETENTION].notnull()) & (df[RETENTION] != 0)]
@@ -229,14 +277,15 @@ def filterForDropout(df):
 
 def reduceRaw(df):
     withoutNulls = df.dropna(axis=1, how='all', inplace=False)
-    withoutNonOperational = withoutNulls[withoutNulls["CURROPER"] == 1]
+    # withoutNonOperational = withoutNulls[withoutNulls["CURROPER"] == 1]
 
-    log.info("Prepared %i rows!" % len(withoutNonOperational))
+    log.info("Prepared %i rows!" % len(withoutNulls))
 
-    return withoutNonOperational
+    return withoutNulls
 
 
 reduced_df = reduceRaw(raw_df)
+old_df = reduceRaw(raw_old_df)
 
 
 def getMajorsForDropdown():

@@ -2,6 +2,9 @@ from dataStore import reduced_df
 import numpy as np
 
 '''
+FINISHED!
+Results used in SAT/ACT section of schoolSelector to determine score differences
+
 One-off experiment to find the point difference between the following for SAT/ACT scores:
 - q1 to q2
 - q2 to q3
