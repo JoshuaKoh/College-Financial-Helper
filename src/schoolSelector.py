@@ -15,14 +15,19 @@ def selectSchools(zipCode, major, sat_crit, sat_writ, sat_math, act):
     userState, userLat, userLong = locU.extractDataFromZip(zipCode)
     byState = do.getByState(byMajor, userState)
 
+    # EXTRAPOLATE NULL SAT/ACT DATA
     for index, row in byState.iterrows():
         byState.loc[byState['UNITID'] == row["UNITID"], 'ACTCMMID'] = schoolsACTSimilarTo(row)
         byState.loc[byState['UNITID'] == row["UNITID"], 'SAT_AVG'] = schoolsSATSimilarTo(row)
 
+    # FILTER (STILL) NULL SAT/ACT ROWS
     withNoSATNulls = byState[byState["SAT_AVG"].notnull()]
     withNoACTNulls = withNoSATNulls[withNoSATNulls["ACTCMMID"].notnull()]
     withNoSAT0s = withNoACTNulls[withNoACTNulls["SAT_AVG"] != 0]
     finalDf = withNoSAT0s[withNoSAT0s["ACTCMMID"] != 0]
+
+    # DROP ROWS OUTSIDE SAT/ACT 25%/75% RANGE
+
 
     userSATwritNorm = testU.normalizeSAT(sat_writ)
     userSATcritNorm = testU.normalizeSAT(sat_crit)
@@ -179,4 +184,4 @@ def testScoreLossFunc(score1, score2):
     return ((score1**2) - (score2**2))**2
 
 
-selectSchools("30277", "business_marketing", 790, 800, 800, 35)
+selectSchools("30277", "business_marketing", 690, 700, 700, 29)
