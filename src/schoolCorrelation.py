@@ -98,8 +98,8 @@ def schoolsACTSimilarTo(school):
 def schoolsSATSimilarTo(school):
     if np.isnan(school["C150_4"]):
         return 0
-    if not np.isnan(school["ACTCMMID"]):
-        return school["ACTCMMID"]
+    if not np.isnan(school["SAT_AVG"]):
+        return school["SAT_AVG"]
 
     targetDropout = school["C150_4"]
     droputDelta = 0.005
