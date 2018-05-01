@@ -1,6 +1,5 @@
 import dataOperations as do
 import locationUtil as locU
-import testScoreUtil as testU
 from dataStore import reduced_df
 import numpy as np
 import pandas as pd
@@ -25,9 +24,10 @@ def selectSchools(zipCode, major, sat_crit, sat_writ, sat_math, act, doGeneralSA
 
     byMajor = do.getByMajor(reduced_df, [major])
 
-    # TODO ALLOW ALL STATES TO BE SEARCHABLE
+    # TODO MAKE THIS TOGGLE-ABLE. LIMIT TO STATE FOR TESTING.
     userState, userLat, userLong = locU.extractDataFromZip(zipCode)
     byState = do.getByState(byMajor, userState)
+    # byState = byMajor
 
     # EXTRAPOLATE NULL SAT/ACT DATA
     for index, row in byState.iterrows():
@@ -43,7 +43,6 @@ def selectSchools(zipCode, major, sat_crit, sat_writ, sat_math, act, doGeneralSA
     finalDf = finalDf.assign(cost_points=pd.Series(np.zeros(len(finalDf))).values)
 
     for index, row in finalDf.iterrows():
-        print(row["INSTNM"])
         # DROP ROWS OUTSIDE SAT/ACT RANGE
         schoolACTMed = row["ACTCMMID"]
         schoolACT25p = row["ACTCM25"] if row["ACTCM25"] else schoolACTMed - actq1q2Distance
@@ -64,8 +63,8 @@ def selectSchools(zipCode, major, sat_crit, sat_writ, sat_math, act, doGeneralSA
             school75p = row["SAT_AVG"] + overallDistance
             if studentScore <= school25p or studentScore >= school75p:
                 finalDf.drop(index, inplace=True)
-                # print("GENERAL SAT")
-                # print("Student %f, Lower %f, Upper %f" % (studentScore, school25p, school75p))
+                print("GENERAL SAT")
+                print("Student %f, Lower %f, Upper %f" % (studentScore, school25p, school75p))
                 continue
         else:
             schoolSATwritMed = row["SATWRMID"]
@@ -84,7 +83,7 @@ def selectSchools(zipCode, major, sat_crit, sat_writ, sat_math, act, doGeneralSA
                     sat_math <= schoolSATmath25p or sat_math >= schoolSATmath75p
                ):
                 # print("PART SAT")
-                # finalDf.drop(index, inplace=True)
+                finalDf.drop(index, inplace=True)
                 continue
 
         cost_points = 0.0
@@ -134,4 +133,4 @@ def testScoreLossFunc(score1, score2):
     return ((score1**2) - (score2**2))**2
 
 
-selectSchools("30277", "computer", 500, 500, 500, 25)
+selectSchools("92679", "engineering", 700, 800, 800, 32)
